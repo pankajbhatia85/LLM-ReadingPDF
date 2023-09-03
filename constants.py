@@ -1,0 +1,1 @@
+OPEN_API_KEY= "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"

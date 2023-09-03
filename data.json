@@ -1,0 +1,28 @@
+{
+  "vulnerability_metadata": {
+    "total_components_count": 3,
+    "oss_components_count": 3,
+    "private_components_count": 0,
+    "tp_components_count": 0,
+    "unknown_components_count": 0,
+    "vulnerabilities_count": 31,
+    "critical": 31,
+    "high": 4,
+    "medium": 0,
+    "low": 0,
+    "fixed_vulnerability_count": 6,
+    "exploitable_vulnerability_count": 4,
+    "available_patch_number": 50,
+    "available_upgrade_number": 10,
+    "patch_count": 15,
+    "upgrade_count": 4,
+    "dependency_type": ["direct", "transitive"],
+    "cve_with_fixes": [
+      {
+        "cve_id": "CVE-2018-aaaa",
+        "patch_minimum_version": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.8.11",
+        "upgrade_minimum_version": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.9.9.2"
+      }
+    ]
+  }
+}
