@@ -30,14 +30,14 @@ async def pdf_file(file:UploadFile):
         file_object.write(await file.read())
    global save_path
    My_pdf, len_pdf=uploaded_docs(file_location)
-   path1=create_index1(My_pdf,"new_index/")
+   path1=create_index1(My_pdf,"new_index_LLM/")
    save_path=path1
    return (f"The file is successfully loaded and index created")  
 
 # This endpoint is to Query the uploaded PDF
 @app.post("/query_PDF")
 async def query_file(item:PDF_File):
-    chatbot=load_model("./new_index")
+    chatbot=load_model("./new_index_LLM")
     result=chatbot.run(item.query)
     return result
 
