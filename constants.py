@@ -1,2 +1,1 @@
-#OPEN_API_KEY= "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"
-OPEN_API_KEY="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"
+OPEN_API_KEY="Insert Your openai key here"
