@@ -43,7 +43,7 @@ def create_index1(data, save_path):
     return save_path
 
 # This function is to query the user input within the Vectorstore and return the top result from the K=5 best docs
-def load_model(output_path: str):
+def load_model(output_path:str):
     return RetrievalQA.from_chain_type(
         llm=ChatOpenAI(
             openai_api_key=OPEN_API_KEY,
