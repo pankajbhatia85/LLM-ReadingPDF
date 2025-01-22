@@ -27,6 +27,21 @@ client=OpenAI(api_key=OPEN_API_KEY)
 # We are using sentence transformer embeddings from HuggingFace
 embedding = HuggingFaceEmbeddings(model_name = "sentence-transformers/all-MiniLM-L6-v2", model_kwargs = {'device':'cpu'})
 
+# This function is to upload a PDF file locally with page numbers and excerpts
+def uploaded_docs(filename):
+    if filename.endswith(".pdf"):
+    # Read PDF file into DataFrame object
+        My_pdf=PdfReader(filename)
+        page_tot=len(My_pdf.pages)
+        extract_data=[]
+        for page_num in range (page_tot):
+          page=My_pdf.pages[page_num]
+          content=page.extract_text()
+          extract_data.append((str(content),str(page_num+1)))
+    else:
+        print("File type not supported")
+    return extract_data,page_tot # type: ignore
+
 # The function to read the pdf page to page and splitting the excerpts to chunks to create documents 
 def prepare_data_summarize(data):
     combined_data = defaultdict(str)
@@ -58,7 +73,7 @@ def get_page_summary(content):
         user_prompt=f"""You are provided with the dictionary with key as the page numbers and values are the summaries of the respective page:
      content: {content} 
      Your task is to combine all the summaries and provide a collated final summary of the document in 300 words"""
-    response=client.chat.completions.create(model="gpt-4o",messages=[
+    response=client.chat.completions.create(model="gpt-3.5-turbo",messages=[
         {
         "role":"system", "content":sys_prompt
         },
@@ -71,16 +86,16 @@ def get_page_summary(content):
     return response.choices[0].message.content
 
 def prepare_data(data):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100,length_function=len,separators='\n')
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=5,length_function=len,separators=['\n'])
     processed_data = []
-    for text , value in tqdm(data):
-        splits = text_splitter.split_text(text)
+    splits = text_splitter.split_text(data)
+    for i,text in enumerate(splits):
         processed_data.extend(
-            [
-                Document(
-                    page_content= texts,
-                    metadata={"source": value}
-                ) for texts in splits
-            ]
-        )
+                [
+                    Document(
+                        page_content= text,
+                        metadata={"source": i}
+                    ) 
+                ]
+            )
     return processed_data

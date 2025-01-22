@@ -8,8 +8,8 @@ from pydantic import BaseModel
 from fastapi import FastAPI, File, UploadFile,Form
 from tqdm import tqdm
 from openai import OpenAI
-from PDF_Read1 import create_index1,uploaded_docs,load_model,new_model,prepare_data
-from summary_functions import prepare_data_summarize,get_page_summary
+from PDF_Read1 import create_index1,load_model,new_model,prepare_data
+from summary_functions import prepare_data_summarize,get_page_summary,prepare_data,uploaded_docs
 import pandas as pd
 import numpy as np
 import time
@@ -27,21 +27,32 @@ app=FastAPI()
 @app.post('/document_summarizer')
 async def pdf_summary(file: UploadFile,  # Accepts a PDF file
     query: str = Form(...)):         # Accepts a user query):
-    page_summaries={}
-    file_location=f"./{file.filename}"
-    with open(file_location, "wb") as file_object:
-         file_object.write(await file.read())
-    My_pdf, len_pdf=uploaded_docs(file_location)
-    docs=prepare_data_summarize(My_pdf)
-    data_dict={}
-    for document in docs:
-        data_dict[document.metadata['source']]=document.page_content
-## Getting page wise summary
-    for page,content in data_dict.items():
-        page_summary=get_page_summary(content)
-        page_summaries[page]=page_summary    
-    return get_page_summary(page_summaries)    
-        
+    if file:
+        page_summaries={}
+        file_location=f"./{file.filename}"
+        with open(file_location, "wb") as file_object:
+             file_object.write(await file.read())
+        My_pdf, len_pdf=uploaded_docs(file_location)
+        docs=prepare_data_summarize(My_pdf)
+        data_dict={}
+        for document in docs:
+            data_dict[document.metadata['source']]=document.page_content
+##     Getting page wise summary
+        for page,content in data_dict.items():
+            page_summary=get_page_summary(content)
+            page_summaries[page]=page_summary    
+        return get_page_summary(page_summaries) 
+
+    else:
+        page_summaries={}
+        docs=prepare_data(query)
+        data_dict1={}
+        for document in docs:
+            data_dict1[document.metadata['source']]=document.page_content
+        for page,content in data_dict1.items():
+            page_summary=get_page_summary(content)
+            page_summaries[page]=page_summary    
+        return get_page_summary(page_summaries)
 
 class PDF_File(BaseModel):
     query: str
