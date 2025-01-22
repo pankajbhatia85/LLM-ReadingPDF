@@ -5,7 +5,7 @@ from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterText
 from langchain.chains import QAWithSourcesChain,RetrievalQA
 from langchain.docstore.document import Document
 from pydantic import BaseModel
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile,Form
 from tqdm import tqdm
 from openai import OpenAI
 from PDF_Read1 import create_index1,uploaded_docs,load_model,new_model,prepare_data
@@ -24,13 +24,9 @@ OPEN_API_KEY=os.environ.get("OPENAI_API_KEY")
 
 app=FastAPI()
 
-client=OpenAI(api_key=OPEN_API_KEY)
-sys_prompt= """You are a research analyst and you are expert in reading the text of the document and summarize it in to 300 words."""
-user_prompt="""You are provided with the PDF document your task is to summarize the provided document in 300 words"""
-
-
-@app.post('/pdf_summarizer')
-async def pdf_summary(file:UploadFile):
+@app.post('/document_summarizer')
+async def pdf_summary(file: UploadFile,  # Accepts a PDF file
+    query: str = Form(...)):         # Accepts a user query):
     page_summaries={}
     file_location=f"./{file.filename}"
     with open(file_location, "wb") as file_object:
@@ -43,12 +39,9 @@ async def pdf_summary(file:UploadFile):
 ## Getting page wise summary
     for page,content in data_dict.items():
         page_summary=get_page_summary(content)
-        page_summaries[page]=page_summary
-    final_summary=get_page_summary(page_summaries)    
-    
-    
-
-app=FastAPI()
+        page_summaries[page]=page_summary    
+    return get_page_summary(page_summaries)    
+        
 
 class PDF_File(BaseModel):
     query: str
@@ -94,7 +87,9 @@ async def query_json(item:PDF_File):
     return result
    
 
-    
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
     
 

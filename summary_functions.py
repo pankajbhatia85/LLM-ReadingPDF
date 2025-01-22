@@ -69,3 +69,18 @@ def get_page_summary(content):
     ]
     )
     return response.choices[0].message.content
+
+def prepare_data(data):
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100,length_function=len,separators='\n')
+    processed_data = []
+    for text , value in tqdm(data):
+        splits = text_splitter.split_text(text)
+        processed_data.extend(
+            [
+                Document(
+                    page_content= texts,
+                    metadata={"source": value}
+                ) for texts in splits
+            ]
+        )
+    return processed_data
