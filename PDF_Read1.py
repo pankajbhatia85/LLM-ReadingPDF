@@ -27,7 +27,7 @@ embedding = HuggingFaceEmbeddings(model_name = "sentence-transformers/all-MiniLM
 
 # The function to read the pdf page to page and splitting the excerpts to chunks to create documents 
 def prepare_data(data):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100,length_function=len,separators='\n')
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100,length_function=len,separators=['\n'])
     processed_data = []
     for text , value in tqdm(data):
         splits = text_splitter.split_text(text)
@@ -47,7 +47,7 @@ def create_index1(data, save_path):
     docsearch = FAISS.from_documents(docs, embedding)             #This part is vectorstore using FAISS
     docsearch.save_local(save_path)
     return save_path
-llm=ChatOpenAI(model="gpt-3.5-turbo",max_completion_tokens=1024, temperature=0.85,api_key=OPEN_API_KEY)
+llm=ChatOpenAI(model="gpt-3.5-turbo",max_completion_tokens=1024, temperature=0.85)
 # This function is to query the user input within the Vectorstore and return the top result from the K=5 best docs
 def load_model(output_path:str):
     return RetrievalQA.from_chain_type(llm=llm,
