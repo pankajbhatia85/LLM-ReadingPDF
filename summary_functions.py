@@ -19,9 +19,7 @@ import json
 from constants import *
 from dotenv import load_dotenv
 load_dotenv()
-os.environ.get("OPENAI_API_KEY")
-openai.api_key=OPEN_API_KEY
-
+OPEN_API_KEY=os.environ.get("OPENAI_API_KEY")
 client=OpenAI(api_key=OPEN_API_KEY)
 
 # We are using sentence transformer embeddings from HuggingFace
